@@ -4,6 +4,9 @@ version = "0.1.0"
 authors = ["theman515"]
 edition = "2018"
 
+[unstable]
+build-std = ["core", "compiler_builtins"]
+
 [profile.dev]
 panic = "abort"
 
@@ -25,3 +28,4 @@ uart_16550 = "0.2.0"
 [dependencies.lazy_static]
 version="1.4.0"
 features = ["spin_no_std"]
+
