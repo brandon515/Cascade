@@ -153,6 +153,7 @@ lazy_static! {
 
 //TESTS
 
+#[allow(unused_imports)]
 #[cfg(test)]
 use crate::{
     serial_print,
@@ -162,33 +163,26 @@ use crate::{
 //check to see if the println macro panics at all
 #[test_case]
 fn test_println_simple() {
-    serial_print!("test_println... ");
     println!("test_println_simple output");
-    serial_println!("[ok]");
 }
 
 //make sure the scrolling doesn't cause anything to panic
 #[test_case]
 fn test_println_many() {
-    serial_print!("test_println... ");
     for _ in 0..200 {
         println!("test_println_simple output");
     }
-    serial_println!("[ok]");
 }
 
 //make sure the println macro is actually writing to the vga interface and not just.... doing
 //nothing I guess
 #[test_case]
 fn test_println_write() {
-    serial_print!("test_println_write... ");
-
     let s = "A test string that will be on a line";
     println!("{}", s);
     for (i, c) in s.chars().enumerate() {
         let screen_char = WRITER.lock().buffer.chars[BUFFER_HEIGHT - 2][i].read();
         assert_eq!(char::from(screen_char.char), c);
     }
-
-    serial_println!("[ok]");
 }
+
