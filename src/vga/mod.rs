@@ -180,11 +180,17 @@ fn test_println_many() {
 //nothing I guess
 #[test_case]
 fn test_println_write() {
-    let s = "A test string that will be on a line";
-    println!("{}", s);
-    for (i, c) in s.chars().enumerate() {
-        let screen_char = WRITER.lock().buffer.chars[BUFFER_HEIGHT - 2][i].read();
-        assert_eq!(char::from(screen_char.char), c);
-    }
+    use core::fmt::Write;
+    use x86_64::instructions::interrupts;
+    interrupts::without_interrupts(||{
+        let s = "A test string that will be on a line";
+        //let mut write = WRITER.lock();
+        println!("\n{}", s);
+        //writeln!(write, "\n{}", s).expect("writeln failed");
+        for (i, c) in s.chars().enumerate() {
+            let screen_char = WRITER.lock().buffer.chars[BUFFER_HEIGHT - 2][i].read();
+            assert_eq!(char::from(screen_char.char), c);
+        }
+    });
 }
 
