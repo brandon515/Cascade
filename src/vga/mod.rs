@@ -18,7 +18,9 @@ macro_rules! println {
 #[doc(hidden)]
 pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
-    WRITER.lock().write_fmt(args).unwrap();//write_fmt is from the write impl that we did
+    x86_64::instructions::interrupts::without_interrupts(|| { // this prevents interrupts from causing a deadlock
+        WRITER.lock().write_fmt(args).unwrap();//write_fmt is from the write impl that we did
+    });
 }
 
 #[allow(dead_code)]
