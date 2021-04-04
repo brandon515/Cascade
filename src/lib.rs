@@ -25,12 +25,26 @@ pub fn init(){
     x86_64::instructions::interrupts::enable();
 }
 
+pub fn hlt_loop() -> ! {
+    loop {
+        x86_64::instructions::hlt();
+    }
+}
+
 #[cfg(test)]
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
+use bootloader::{
+    BootInfo,
+    entry_point,
+};
+
+#[cfg(test)]
+entry_point!(kernel_main);
+
+#[cfg(test)]
+fn kernel_main(_boot_info: &'static BootInfo) -> ! {
     init();
     test_main();
-    loop {}
+    hlt_loop()
 }
 
 /*#[cfg(test)]
@@ -67,7 +81,7 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
     serial_println!("[failed]\n");
     serial_println!("Error: {}\n", info);
     exit_qemu(QemuExitCode::Failed);
-    loop {}
+    hlt_loop()
 }
 
 

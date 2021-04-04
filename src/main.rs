@@ -5,14 +5,19 @@
 #![reexport_test_harness_main = "test_main"]
 
 extern crate cascade;
+use bootloader::{
+    BootInfo,
+    entry_point,
+};
 use core::panic::PanicInfo;
 use cascade::{
     println,
 };
 
 //entry point!
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
+entry_point!(kernel_main); //this macro checks to make sure the entry point is the correct function signature
+
+fn kernel_main(boot_info: &'static BootInfo) -> ! {
     
     cascade::init();
 
@@ -22,7 +27,7 @@ pub extern "C" fn _start() -> ! {
 
     println!("Hello World{}", "!");
 
-    loop {}
+    cascade::hlt_loop();
 }
 
 #[cfg(test)]
@@ -35,5 +40,5 @@ fn panic(info: &PanicInfo) -> ! {
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    cascade::hlt_loop();
 }
