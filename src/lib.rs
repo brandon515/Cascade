@@ -10,6 +10,7 @@ pub mod cpu;
 pub mod serial;
 pub mod interrupts;
 pub mod gdt;
+pub mod memory;
 
 use core::panic::PanicInfo;
 use cpu::{
