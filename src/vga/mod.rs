@@ -1,7 +1,7 @@
 use volatile::Volatile;
-use core::fmt;
 use lazy_static::lazy_static;
 use spin::Mutex;
+use core::fmt;
 
 //marco magic that's from std
 #[macro_export]
@@ -180,7 +180,6 @@ fn test_println_many() {
 //nothing I guess
 #[test_case]
 fn test_println_write() {
-    use core::fmt::Write;
     use x86_64::instructions::interrupts;
     interrupts::without_interrupts(||{
         let s = "A test string that will be on a line";
