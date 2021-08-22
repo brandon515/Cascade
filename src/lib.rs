@@ -4,6 +4,7 @@
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 #![feature(abi_x86_interrupt)]
+#![feature(alloc_error_handler)]
 pub mod panic;
 pub mod vga;
 pub mod cpu;
@@ -11,6 +12,9 @@ pub mod serial;
 pub mod interrupts;
 pub mod gdt;
 pub mod memory;
+
+//this is already part of core but we need to let the comiler knowwe're using it
+extern crate alloc;
 
 use core::panic::PanicInfo;
 use cpu::{
@@ -90,4 +94,10 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
 	test_panic_handler(info)
+}
+
+
+#[alloc_error_handler]
+fn alloc_error_handler(layout: alloc::alloc::Layout) -> !{
+    panic!("Allocation error: {:?}", layout);
 }

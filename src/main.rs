@@ -5,16 +5,22 @@
 #![reexport_test_harness_main = "test_main"]
 
 extern crate cascade;
+extern crate alloc;
 use bootloader::{
     BootInfo,
     entry_point,
 };
 use core::panic::PanicInfo;
 use cascade::{
-    memory::active_level_4_table,
+    memory::{
+        self,
+        allocator,
+    },
     println,
 };
-use x86_64::VirtAddr;
+use x86_64::{
+    VirtAddr,
+};
 
 //entry point!
 entry_point!(kernel_main); //this macro checks to make sure the entry point is the correct function signature
@@ -23,13 +29,13 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     cascade::init();
 
     let physical_memory_offset = VirtAddr::new(boot_info.physical_memory_offset);
-    let level_4_table = unsafe { active_level_4_table(physical_memory_offset) };
-
-    for (i, entry) in level_4_table.iter().enumerate() {
-        if !entry.is_unused(){
-            println!("L4 Entry {}: {:?}", i, entry);
-        }
-    }
+    let mut page_table_mapper = unsafe{ memory::init(physical_memory_offset) };
+    let mut frame_allocator = {
+        let mut temp_allocator= unsafe {memory::BootInfoFrameAllocator::new(&boot_info.memory_map)};
+        allocator::init_heap(&mut page_table_mapper, &mut temp_allocator)
+            .expect("Heap init failed");
+        unsafe {memory::HeapFrameAllocator::new(&boot_info.memory_map)}
+    };
 
     #[cfg(test)]
     test_main();
