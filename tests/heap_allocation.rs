@@ -36,6 +36,7 @@ fn main(boot_info: &'static BootInfo) -> ! {
         .expect("Heap init failed");
     let mut frame_allocator = unsafe {memory::HeapFrameAllocator::new(&boot_info.memory_map)};
 
+
     test_main();
     loop {}
 }
@@ -43,10 +44,6 @@ fn main(boot_info: &'static BootInfo) -> ! {
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     cascade::test_panic_handler(info)
-}
-
-#[test_case]
-fn heap_frame_allocator(){
 }
 
 #[test_case]

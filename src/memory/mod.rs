@@ -28,12 +28,16 @@ use alloc::{
 
 
 pub struct HeapFrameAllocator{
+    memory_map: &'static MemoryMap,
     memory_iter: Box<dyn Iterator<Item = PhysFrame>>,
 }
 
 unsafe impl FrameAllocator<Size4KiB> for HeapFrameAllocator{
     fn allocate_frame(&mut self) -> Option<PhysFrame> {
-        self.memory_iter.next()
+        match self.memory_iter.next(){
+            Some(x) => Some(x),
+            None => self.refresh_memory(),
+        }
     }
 }
 
@@ -47,13 +51,36 @@ impl HeapFrameAllocator{
         let addr_ranges = usable_regions
             .map(|r| r.range.start_addr()..r.range.end_addr());
         //get an address 4kb apart 
-        let frame_addresses = addr_ranges.flat_map(|r| r.step_by(4096));
+        let four = 4*1024;
+        let frame_addresses = addr_ranges.flat_map(|r| r.step_by(four));
         //now the containing_address function gets the start address of each frame, even if the
         //address is in the middle of the frame
         let frame_list: Vec<PhysFrame> = frame_addresses.map(|addr| PhysFrame::containing_address(PhysAddr::new(addr))).collect();
         HeapFrameAllocator{
+            memory_map: memory_map,
             memory_iter: Box::new(frame_list.into_iter()),
         }
+    }
+
+    pub fn refresh_memory(&mut self) -> Option<PhysFrame>{
+        //get all usable regions of memory
+        let regions = self.memory_map.iter();
+        let usable_regions = regions
+            .filter(|r| r.region_type == MemoryRegionType::Usable);
+        //map each regions to it's address range
+        let addr_ranges = usable_regions
+            .map(|r| r.range.start_addr()..r.range.end_addr());
+        //get an address 4kb apart 
+        let four = 4*1024;
+        let frame_addresses = addr_ranges.flat_map(|r| r.step_by(four));
+        //now the containing_address function gets the start address of each frame, even if the
+        //address is in the middle of the frame
+        let frame_list: Vec<PhysFrame> = frame_addresses.map(|addr| PhysFrame::containing_address(PhysAddr::new(addr))).collect();
+
+        let mut frame_iter = Box::new(frame_list.into_iter());
+        let ret = frame_iter.next();
+        self.memory_iter = frame_iter;
+        ret
     }
 }
 
