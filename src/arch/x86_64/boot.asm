@@ -17,6 +17,23 @@ check_multiboot:
   cmp eax, 0x36d76289 ; according to the multiboot spec this must be written to eax when the kernel is loaded
   jne .no_multiboot ; jump to multiboot if the previous comparison isn't equal
   ret
+check_cpuid:
+  pushfd ; push the FLAGS into EAX and go up the stack
+  pop eax
+  mov ecx, eax
+  xor eax, 1 << 21 ; if we can flip this bit CPUID is enabled
+  push eax
+  popfd
+  pushfd ; copy the FLAGS back into EAX, to see if the bit was flipped
+  pop eax
+  push ecx
+  popfd
+  xor eax, ecx
+  jz .no_cpuid ; two values xor'd together should be zero if they're the same
+  ret
+.no_cpuid:
+  mov al, "1"
+  jmp error
 .no_multiboot:
   mov al, "0"
   jmp error
