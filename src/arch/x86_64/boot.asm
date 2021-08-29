@@ -1,4 +1,5 @@
 global start
+extern long_mode_start
 
 section .text
 bits 32 ; 32 bit instructions, this will change to 64 once we go to long mode
@@ -9,14 +10,19 @@ start:
   call check_cpuid
   call check_long_mode
   call enable_paging
-  mov dword [0xb8000], 0x2f4b2f4f ; put OK on the screen
-  hlt
+  call enable_long_mode
+  lgdt [gdt64.pointer]
+  jmp gdt64.code:long_mode_start
+  ;mov dword [0xb8000], 0x2f4b2f4f ; put OK on the screen
+  ;hlt
+
 error:
   mov dword [0xb8000], 0x4f524f45 ; ER
   mov dword [0xb8000], 0x4f524f45 ; R:
   mov dword [0xb8000], 0x4f524f45 ;   
   mov byte [0xb8000], al ; register with the error code
   hlt
+
 check_multiboot:
   cmp eax, 0x36d76289 ; according to the multiboot spec this must be written to eax when the kernel is loaded
   jne .no_multiboot ; jump to multiboot if the previous comparison isn't equal
@@ -24,6 +30,7 @@ check_multiboot:
 .no_multiboot:
   mov al, "0"
   jmp error
+
 check_cpuid:
   pushfd ; push the FLAGS into EAX and go up the stack
   pop eax
@@ -41,6 +48,7 @@ check_cpuid:
 .no_cpuid:
   mov al, "1"
   jmp error
+
 check_long_mode: ; check to see if we can enter long mode
   mov eax, 0x80000000 ; get highest extended function implemented
   cpuid
@@ -54,6 +62,7 @@ check_long_mode: ; check to see if we can enter long mode
 .no_long_mode:
   mov al, "2"
   jmp error
+
 enable_paging:
   mov edi, 0x1000   ; the location in memory of the 4th level page table
   mov cr3, edi      ; let the CPU know where the page table is
@@ -80,11 +89,25 @@ enable_paging:
   or eax, 1 << 5  ; set the 5th bit to enable paging
   mov cr4, eax    ; push it back to CR4
   ret
+
 enable_long_mode:
-  mov eax, cr4
   mov ecx, 0xC0000080
-  rdmsr
-  or eax, 1 << 8
+  rdmsr               ; read from model-specific register or MSR into EAX
+  or eax, 1 << 8      ; enable the 8th bit which shows that long mode is enabled
+  wrmsr               ; write back to MSR from EAX
+  mov eax, cr0
+  or eax, 1 << 31 | 1 << 0  ; set the paging bit(31) and the protected mode bit(0)
+  mov cr0, eax
+  ret
+
+section .rodata
+gdt64:
+  dq 0 ; zero entry, required to be the first entry in the GDT
+.code: equ $ - gdt64 ; set the code segment label to the offset instead of the raw address
+  dq (1<<43) | (1<<44) | (1<<47) | (1<<53) ; 43: code segment 44: code segment 47: present 53: 64 bit code segment
+.pointer:
+  dw $ - gdt64 - 1 ; GDT length
+  dq gdt64  ; GDT address
 section .bss
 stack_bottom:
   resb 64
