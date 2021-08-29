@@ -8,6 +8,7 @@ start:
   call check_multiboot
   call check_cpuid
   call check_long_mode
+  call enable_paging
   mov dword [0xb8000], 0x2f4b2f4f ; put OK on the screen
   hlt
 error:
@@ -53,7 +54,37 @@ check_long_mode: ; check to see if we can enter long mode
 .no_long_mode:
   mov al, "2"
   jmp error
+enable_paging:
+  mov edi, 0x1000   ; the location in memory of the 4th level page table
+  mov cr3, edi      ; let the CPU know where the page table is
+  xor eax, eax      ; zero out eax
+  mov ecx, 4096
+  rep stosd         ; this instruction puts the value of EAX into the memory pointed at by EDI ECX number of times
+  mov edi, cr3      ; makes sure EDI is pointing to the begining of the page table
+  mov DWORD [edi], 0x2003   ; set the point pointed at by EDI to 0x2003, 3 is to set page to present and writable
+  add edi, 0x1000
+  mov DWORD [edi], 0x3003   ; doing the same thing for the next 3 levels
+  add edi, 0x1000
+  mov DWORD [edi], 0x4003   ; 0x4000 is the level 1 page table
+  add edi, 0x1000
+  mov ebx, 0x00000003       ; set the first two bits to present and writable
+  mov ecx, 512              ; ecx controls the amount of time the loop instruction loops
 
+.set_entry:
+  mov DWORD [edi], ebx      ; set the page to present and writable
+  add ebx, 0x1000           ; increase the physical memory we're mapping by 4096 or 4KiB
+  add edi, 8                ; add the page table index by 8 bytes which is the size of a 64-bit memory address
+  loop .set_entry
+
+  mov eax, cr4    ; set the a register to CR4
+  or eax, 1 << 5  ; set the 5th bit to enable paging
+  mov cr4, eax    ; push it back to CR4
+  ret
+enable_long_mode:
+  mov eax, cr4
+  mov ecx, 0xC0000080
+  rdmsr
+  or eax, 1 << 8
 section .bss
 stack_bottom:
   resb 64
