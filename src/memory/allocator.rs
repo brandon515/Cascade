@@ -22,17 +22,17 @@ use linked_list_allocator::LockedHeap;
 
 pub const HEAP_START: usize = 0x_4444_4444_0000;
 pub const HEAP_SIZE: usize = 300 * 1024; //300 KiB
-//pub struct GlobalAllocator;
+pub struct GlobalAllocator;
 
-/*unsafe impl GlobalAlloc for GlobalAllocator{
-    unsafe fn alloc(&self, layout: Layout) -> *mut u8{
+unsafe impl GlobalAlloc for GlobalAllocator{
+    unsafe fn alloc(&self, _layout: Layout) -> *mut u8{
         null_mut()
     }
 
-    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout){
+    unsafe fn dealloc(&self, _ptr: *mut u8, _layout: Layout){
         panic!("no memory should be allocated so this should never be called");
     }
-}*/
+}
 
 #[global_allocator]
 static A: LockedHeap = LockedHeap::empty();

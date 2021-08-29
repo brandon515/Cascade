@@ -37,8 +37,6 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
         unsafe {memory::HeapFrameAllocator::new(&boot_info.memory_map)}
     };
 
-    println!("{:?}", &boot_info.memory_map);
-
     #[cfg(test)]
     test_main();
 

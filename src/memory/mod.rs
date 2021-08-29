@@ -44,7 +44,22 @@ impl<A> Locked<A> {
         self.inner.lock()
     }
 }
+// this only works when align is a power of 2
+// example:
+//      align = 0b0001000
+//      addr = 0b01010111
+//      align-1 = 0b0000111
+//      !(align-1) = 0b1111000
+//      addr+align = 0b01011111
+//      addr+align-1 = 0b01011110
+//      (addr+align-1) & !(align-1) = 0b01011000
+//  which aligns it to align and the top size. That way we don't stop on memory that's already been
+//  allocated. For pages alignment will be 4096 or 0x0100 or 0b01000000000000
+fn align_up(addr: usize, align: usize) -> usize {
+    (addr + align - 1) & !(align - 1)
+}
 
+// Allocator that puts a list of pages onto the heap, obviously it's only usable... with a heap
 pub struct HeapFrameAllocator{
     memory_map: &'static MemoryMap,
     memory_iter: Box<dyn Iterator<Item = PhysFrame>>,
