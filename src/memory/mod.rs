@@ -26,6 +26,24 @@ use alloc::{
     vec::Vec,
 };
 
+// this is to get arround rust limitations of not implementing types that aren't created in this
+// crate.
+// Memory allocators need to be mutable but are static and can't but mutable without a mutex
+pub struct Locked<A> {
+    inner: spin::Mutex<A>,
+}
+
+impl<A> Locked<A> {
+    pub const fn new(inner: A) -> Self {
+        Locked{
+            inner: spin::Mutex::new(inner),
+        }
+    }
+
+    pub fn lock(&self) -> spin::MutexGuard<A> {
+        self.inner.lock()
+    }
+}
 
 pub struct HeapFrameAllocator{
     memory_map: &'static MemoryMap,

@@ -13,7 +13,7 @@ pub mod interrupts;
 pub mod gdt;
 pub mod memory;
 
-//this is already part of core but we need to let the compiler knowwe're using it
+//this is already part of core but we need to let the compiler know we're using it
 extern crate alloc;
 
 use core::panic::PanicInfo;
