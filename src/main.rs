@@ -30,12 +30,12 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     let physical_memory_offset = VirtAddr::new(boot_info.physical_memory_offset);
     let mut page_table_mapper = unsafe{ memory::init(physical_memory_offset) };
-//    let mut frame_allocator = {
+    let mut _frame_allocator = {
         let mut temp_allocator= unsafe {memory::BootInfoFrameAllocator::new(&boot_info.memory_map)};
         allocator::init_heap(&mut page_table_mapper, &mut temp_allocator)
             .expect("Heap init failed");
-//        unsafe {memory::HeapFrameAllocator::new(&boot_info.memory_map)}
-//    };
+        unsafe {memory::HeapFrameAllocator::new(&boot_info.memory_map)}
+    };
 
     #[cfg(test)]
     test_main();

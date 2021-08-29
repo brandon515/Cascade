@@ -52,11 +52,11 @@ fn kernel_main(_boot_info: &'static BootInfo) -> ! {
     hlt_loop()
 }
 
-/*#[cfg(test)]
+#[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     tests::test_panic_handler(info)
-}*/
+}
 
 pub trait Testable {
     fn run(&self) -> ();
