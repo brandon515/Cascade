@@ -1,5 +1,7 @@
 global start
+global gdt64
 extern long_mode_start
+extern kernel_main
 
 section .text
 bits 32 ; 32 bit instructions, this will change to 64 once we go to long mode
@@ -13,8 +15,8 @@ start:
   call enable_long_mode
   lgdt [gdt64.pointer]
   jmp gdt64.code:long_mode_start
-  ;mov dword [0xb8000], 0x2f4b2f4f ; put OK on the screen
-  ;hlt
+  mov dword [0xb8000], 0x2f4b2f4f ; put OK on the screen
+  hlt
 
 error:
   mov dword [0xb8000], 0x4f524f45 ; ER
@@ -110,5 +112,5 @@ gdt64:
   dq gdt64  ; GDT address
 section .bss
 stack_bottom:
-  resb 64
+  resb 0x4000
 stack_top:

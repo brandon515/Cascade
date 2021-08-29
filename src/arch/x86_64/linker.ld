@@ -11,5 +11,10 @@ SECTIONS {
   .text :
   {
     *(.text)
+    *(.rodata)
+  }
+  .bss :
+  {
+    *(.bss)
   }
 }
