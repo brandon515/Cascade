@@ -9,7 +9,6 @@ static volatile uint16_t *video = (uint16_t *) VIDEO;
 static int xpos = 0;
 
 static void newline(void){
-
   xpos = 0;
   for(int y = 1; y < LINES+1; y++){
     for(int x = 0; x < COLUMNS+1; x++){
@@ -47,9 +46,9 @@ void kprintf (char *format, ...) {
 	while(format[i] != 0){
 		if(format[i] == '%'){
       i++; // increment the position in the format to see what the next letter is
+      uint64_t arg = va_arg(others, uint64_t);
       switch(format[i]){
         case 'x': // hexadecimal
-          uint64_t arg = va_arg(others, uint64_t);
           char buf[16];
           int b = 15;
           while(b >= 0){
@@ -82,12 +81,26 @@ void kprintf (char *format, ...) {
             b--;
           }
           for(int z = 0; z < 16; z++){
-            if(buf[z] != '0'){
-              kputchar(buf[z]);
-            }
+            kputchar(buf[z]);
           }
           i++;
           break; //case 'x'
+        case 'd':
+          char* buf2;
+          int buf_len = 0;
+          int b2 = 0;
+          while(b2 > 0){
+            uint8_t num = arg%10;
+            arg = arg/10;
+            buf2[b2] = num+48;
+            buf_len++;
+            b2++;
+          }
+          for(int k = 0; k < buf_len; k++){
+            kputchar(buf2[k]);
+          }
+          i++;
+          break;
       }
 		}else{
       kputchar(format[i]);

@@ -1,4 +1,5 @@
 global long_mode_start
+global get_page_table
 extern gdt64
 
 section .text
@@ -12,8 +13,11 @@ long_mode_start:
   mov fs, ax
   mov gs, ax
   mov ss, ax
-  lea rdi, [gdt64]
   call kernel_main
   ;mov rax, 0x2f592f412f4b2f4f
   ;mov qword [0xb8000], rax
   hlt
+
+get_page_table:
+  mov rax, cr3 ; move the address of the page table to the return register
+  ret

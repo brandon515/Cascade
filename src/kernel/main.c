@@ -2,8 +2,12 @@
 #include "printf.h"
 #include "multiboot.h"
 
-void kernel_main(unsigned long magic){
+
+void kernel_main(void* info, uint32_t magic){
   cls();
-	kprintf("tester testing test 0x%x", 0x5353abcdef);
+  kprintf("type: %d", boot_info[0].type);
+  kprintf("size: %d", boot_info[0].size);
+  kprintf("lower: %d", boot_info[0].lower);
+  kprintf("upper: %d", boot_info[0].upper);
 	return;
 }

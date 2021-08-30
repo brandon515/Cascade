@@ -13,7 +13,7 @@ c_obj_files := $(patsubst src/kernel/%.c, build/kernel/%.o, $(c_src_files))
 linker := $(arch)-elf-ld
 compiler := $(arch)-elf-gcc
 
-.PHONY: all clean run iso# telling make that these aren't physical files and to always run them when told
+.PHONY: all clean run iso debug# telling make that these aren't physical files and to always run them when told
 
 all: $(kernel) 
 
@@ -21,6 +21,9 @@ clean:
 	@rm -r build
 
 run: $(iso)
+	@qemu-system-x86_64 -cdrom $(iso)
+
+debug: $(iso)
 	@qemu-system-x86_64 -s -S -cdrom $(iso)
 
 iso: $(iso)
@@ -43,4 +46,4 @@ build/arch/$(arch)/%.o: src/arch/$(arch)/%.asm
 
 build/kernel/%.o: src/kernel/%.c
 	@mkdir -p $(shell dirname $@)
-	@$(arch)-elf-gcc -g -Wno-builtin-declaration-mismatch -g -O -c $< -o $@
+	@$(arch)-elf-gcc -m64 -c $< -o $@ -ffreestanding -z max-page-size=0x1000 -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -std=gnu99 -O2 -Wall -Wextra

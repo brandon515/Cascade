@@ -1,13 +1,15 @@
 global start
-global gdt64
+extern save_info 
 extern long_mode_start
-extern kernel_main
 
 section .text
 bits 32 ; 32 bit instructions, this will change to 64 once we go to long mode
 ; 0xb8000 is the VGA buffer for the screen
 start:
   mov esp, stack_top ; ESP is the register with the stack pointer, just set it to the highest memory address because the stack goes down
+  mov ebp, stack_top
+  push ebx
+  call save_info 
   call check_multiboot
   call check_cpuid
   call check_long_mode
@@ -81,7 +83,7 @@ enable_paging:
   mov ebx, 0x00000003       ; set the first two bits to present and writable
   mov ecx, 512              ; ecx controls the amount of time the loop instruction loops
 
-.set_entry:
+.set_entry: ; Identity make the first 512 pages, which is  2 MiB of ram
   mov DWORD [edi], ebx      ; set the page to present and writable
   add ebx, 0x1000           ; increase the physical memory we're mapping by 4096 or 4KiB
   add edi, 8                ; add the page table index by 8 bytes which is the size of a 64-bit memory address
