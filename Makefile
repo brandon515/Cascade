@@ -46,4 +46,4 @@ build/arch/$(arch)/%.o: src/arch/$(arch)/%.asm
 
 build/kernel/%.o: src/kernel/%.c
 	@mkdir -p $(shell dirname $@)
-	@$(arch)-elf-gcc -m64 -c $< -o $@ -ffreestanding -z max-page-size=0x1000 -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -std=gnu99 -O2 -Wall -Wextra
+	@$(arch)-elf-gcc -g -m64 -c $< -o $@ -ffreestanding -z max-page-size=0x1000 -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -std=gnu99 -O2 -Wall -Wextra

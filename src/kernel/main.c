@@ -1,13 +1,14 @@
 #include "stdint.h"
-#include "printf.h"
-#include "multiboot.h"
+//#include "printf.h"
 
+typedef struct _memory_sector{
+  uint32_t type;
+  uint32_t size;
+  uint32_t lower;
+  uint32_t upper;
+} memory_sector;
 
-void kernel_main(void* info, uint32_t magic){
-  cls();
-  kprintf("type: %d", boot_info[0].type);
-  kprintf("size: %d", boot_info[0].size);
-  kprintf("lower: %d", boot_info[0].lower);
-  kprintf("upper: %d", boot_info[0].upper);
+static volatile uint16_t *video = (uint16_t *) 0xb8000;
+void kernel_main(uint32_t* info){
 	return;
 }

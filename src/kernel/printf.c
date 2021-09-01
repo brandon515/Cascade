@@ -34,7 +34,7 @@ static void kputchar (char c) {
 
 
 void cls(void){
-	for(int i = 0; i < COLUMNS*LINES; i++){
+	for(uint16_t i = 0; i < COLUMNS*LINES; i++){
 		video[i] = 0;
 	}
 }

@@ -1,6 +1,6 @@
 global start
-extern save_info 
 extern long_mode_start
+extern kernel_main
 
 section .text
 bits 32 ; 32 bit instructions, this will change to 64 once we go to long mode
@@ -8,15 +8,15 @@ bits 32 ; 32 bit instructions, this will change to 64 once we go to long mode
 start:
   mov esp, stack_top ; ESP is the register with the stack pointer, just set it to the highest memory address because the stack goes down
   mov ebp, stack_top
+  ;call check_multiboot
   push ebx
-  call save_info 
-  call check_multiboot
-  call check_cpuid
-  call check_long_mode
-  call enable_paging
-  call enable_long_mode
-  lgdt [gdt64.pointer]
-  jmp gdt64.code:long_mode_start
+  call kernel_main
+  ;call check_cpuid
+  ;call check_long_mode
+  ;call enable_paging
+  ;call enable_long_mode
+  ;lgdt [gdt64.pointer]
+  ;jmp gdt64.code:long_mode_start
   mov dword [0xb8000], 0x2f4b2f4f ; put OK on the screen
   hlt
 
