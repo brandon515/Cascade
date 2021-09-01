@@ -3,6 +3,7 @@ use core::{
     alloc::{
         GlobalAlloc,
         Layout,
+        Box,
     },
 };
 
@@ -18,13 +19,23 @@ use x86_64::{
     VirtAddr,
 };
 
+use super::Locked;
+
 use linked_list_allocator::LockedHeap;
 
 pub const HEAP_START: usize = 0x_4444_4444_0000;
-pub const HEAP_SIZE: usize = 300 * 1024; //300 KiB
-pub struct GlobalAllocator;
+pub const HEAP_SIZE: usize = 512 * 1024; //512 KiB
+pub struct MemorySector{
+    free: bool,
+    left: Option<Box<MemorySector>>,
+    right: Option<Box<MemorySector>>,
+}
 
-unsafe impl GlobalAlloc for GlobalAllocator{
+pub struct BuddyAllocator{
+    root: Box<MemorySector>,
+}
+
+unsafe impl GlobalAlloc for Locked<BuddyAllocator>{
     unsafe fn alloc(&self, _layout: Layout) -> *mut u8{
         null_mut()
     }
