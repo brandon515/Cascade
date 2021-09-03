@@ -3,7 +3,7 @@
 #define ATTRIBUTE			(7<<8)
 #define VIDEO					0xB8000
 #include <stdarg.h>
-#include "stdint.h"
+#include <stdint.h>
 
 static volatile uint16_t *video = (uint16_t *) VIDEO;
 static int xpos = 0;
@@ -30,6 +30,7 @@ static void kputchar (char c) {
   if (xpos >= COLUMNS){
     newline();
   }
+  return;
 }
 
 
@@ -37,6 +38,7 @@ void cls(void){
 	for(uint16_t i = 0; i < COLUMNS*LINES; i++){
 		video[i] = 0;
 	}
+  return;
 }
 
 void kprintf (char *format, ...) {

@@ -36,14 +36,14 @@ $(iso): $(kernel) $(grub_cfg)
 	@rm -r build/isofiles
 
 $(kernel): $(c_obj_files) $(asm_obj_files) $(linker_script)
-	@ld -n -T $(linker_script) -o $(kernel) $(asm_obj_files) $(c_obj_files)
+	@ld -n -T $(linker_script) -o $(kernel) $(asm_obj_files) $(c_obj_files) $(asm_ker_obj_files)
 
 # $@ and $< are automatic variables
 # $@ is the target, in this case the .o file
 build/arch/$(arch)/%.o: src/arch/$(arch)/%.asm
 	@mkdir -p $(shell dirname $@)
-	@nasm -felf64 $< -o $@
+	@nasm -g -felf64 $< -o $@
 
 build/kernel/%.o: src/kernel/%.c
 	@mkdir -p $(shell dirname $@)
-	@$(arch)-elf-gcc -g -m64 -c $< -o $@ -ffreestanding -z max-page-size=0x1000 -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -std=gnu99 -O2 -Wall -Wextra
+	@$(arch)-elf-gcc -g -m64 -c $< -o $@ -ffreestanding -z max-page-size=0x1000 -mgeneral-regs-only -mno-red-zone -mno-mmx -mno-sse -mno-sse2 -std=gnu99 -O2 -Wall -Wextra
