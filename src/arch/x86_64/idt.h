@@ -15,6 +15,6 @@ typedef struct _idt_descriptor {
   idt_entry* start;
 } idt_descriptor;
 void load_idt(idt_descriptor*);
-idt_entry create_idt_entry(uint64_t function);
+void create_idt_entry(idt_entry* entry, uint64_t function);
 #endif
 

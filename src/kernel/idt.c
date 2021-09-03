@@ -12,14 +12,12 @@ typedef struct IDTDescr {
 } idt_entry;
 */
 
-idt_entry create_idt_entry(uint64_t function){
-  idt_entry entry;
-  entry.offset_1 = function&0xffff;
-  entry.offset_2 = (function>>16)&0xff;
-  entry.offset_3 = function>>32;
-  entry.ist = 0; // this is set to 0 in 64 bit mode
-  entry.selector = 1; // GDT Code Sector, the kernel code is 1
-  entry.type_attr = 0x8f;
-  entry.zero = 0;
-  return entry;
+void create_idt_entry(idt_entry* entry, uint64_t function){
+  entry->offset_1 = function&0xffff;
+  entry->offset_2 = (function>>16)&0xff;
+  entry->offset_3 = function>>32;
+  entry->ist = 0; // this is set to 0 in 64 bit mode
+  entry->selector = 8; // GDT Code Sector, the kernel code is 1
+  entry->type_attr = 0x8f;
+  entry->zero = 0;
 }
