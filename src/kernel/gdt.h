@@ -8,6 +8,6 @@ typedef struct _gdt_entry{
   uint8_t access;
   uint8_t upper_limit_flags;
   uint8_t upper_base;
-} gdt_entry;
+}__attribute__((packed)) gdt_entry;
 void create_gdt_entry(gdt_entry* entry, uint32_t base, uint32_t limit, uint8_t access, uint8_t flags);
 #endif

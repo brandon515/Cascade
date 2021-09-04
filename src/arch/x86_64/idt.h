@@ -9,11 +9,11 @@ typedef struct IDTDescr {
    uint16_t offset_2; // offset bits 16..31
    uint32_t offset_3; // offset bits 32..63
    uint32_t zero;     // reserved
-} idt_entry;
+}__attribute__((packed)) idt_entry;
 typedef struct _idt_descriptor {
   uint16_t limit;
   idt_entry* start;
-} idt_descriptor;
+}__attribute__((packed)) idt_descriptor;
 void load_idt(idt_descriptor*);
 void create_idt_entry(idt_entry* entry, uint64_t function);
 #endif
