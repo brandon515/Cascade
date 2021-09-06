@@ -12,12 +12,22 @@ typedef struct IDTDescr {
 } idt_entry;
 */
 
-void create_idt_entry(idt_entry* entry, uint64_t function){
-  entry->offset_1 = function&0xffff;
-  entry->offset_2 = (function>>16)&0xff;
-  entry->offset_3 = function>>32;
-  entry->ist = 0; // this is set to 0 in 64 bit mode
-  entry->selector = 8; // GDT Code Sector, the kernel code is 1
-  entry->type_attr = 0x8f;
-  entry->zero = 0;
+static idt_entry idt[IDT_ENTRIES];
+
+void create_idt_entry(int idt_index, uint64_t function, uint8_t flags){
+  //idt_entry *entry = &idt[idt_index];
+  idt[idt_index].offset_1 = function&0xffff;
+  idt[idt_index].offset_2 = (function>>16)&0xff;
+  idt[idt_index].offset_3 = function>>32;
+  idt[idt_index].ist = 0; // this is set to 0 in 64 bit mode
+  idt[idt_index].selector = 8; // GDT Code Sector, this is the offest in bytes
+  idt[idt_index].type_attr = flags;//0x8f;
+  idt[idt_index].zero = 0;
+}
+
+void init_idt(){
+  idt_descriptor idt_des;
+  idt_des.limit = sizeof(idt_entry)*IDT_ENTRIES;
+  idt_des.start = &idt[0];
+  load_idt(&idt_des);
 }

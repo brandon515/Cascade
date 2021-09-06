@@ -1,6 +1,11 @@
 #ifndef IDT_H_
 #define IDT_H_
 #include <stdint.h>
+
+#define IDT_ENTRIES 256
+#define TRAP_GATE_32 0x8f
+#define INT_GATE_32 0X8E
+
 typedef struct IDTDescr {
    uint16_t offset_1; // offset bits 0..15
    uint16_t selector; // a code segment selector in GDT or LDT
@@ -14,7 +19,10 @@ typedef struct _idt_descriptor {
   uint16_t limit;
   idt_entry* start;
 }__attribute__((packed)) idt_descriptor;
+
+
+void init_idt();
 void load_idt(idt_descriptor*);
-void create_idt_entry(idt_entry* entry, uint64_t function);
+void create_idt_entry(int idt_index, uint64_t function, uint8_t flags);
 #endif
 

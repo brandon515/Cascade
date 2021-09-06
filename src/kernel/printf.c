@@ -77,7 +77,7 @@ void kprintf (char *format, ...) {
           if(arg == 0){
             kputchar('0');
           }
-          char* buf2;
+          char* buf2 = {0};
           int b2 = 0;
           while(arg != 0){
             char num = arg%10;

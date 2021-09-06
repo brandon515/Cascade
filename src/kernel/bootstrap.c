@@ -1,6 +1,7 @@
-#include "stdint.h"
+#include <stdint.h>
 #include "../arch/x86_64/boot.h"
 #include "gdt.h"
+#include "printf.h"
 
 void bootstrap(uint32_t info, uint32_t magic, uint32_t gdt){
   if(magic != 0x36d76289){

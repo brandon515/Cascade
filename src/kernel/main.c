@@ -1,4 +1,3 @@
-#define IDT_ENTRIES 256
 #include <stdint.h>
 #include "printf.h"
 #include "gdt.h"
@@ -12,21 +11,13 @@ typedef struct _memory_sector{
   uint32_t upper;
 } memory_sector;
 
-static idt_entry idt[IDT_ENTRIES];
 
 void kmain(memory_sector* info, uint64_t* page_table, gdt_entry* gdt){
   cls();
-  idt_descriptor idt_des;
-  idt_des.limit = sizeof(idt_entry)*IDT_ENTRIES;
-  idt_des.start = &idt[0];
-  load_idt(&idt_des);
-  create_idt_entry(&idt[8], (uint64_t)&double_fault_handler);
-  /*kprintf("Double fault handler: 0x%x\n", double_fault_handler);
-  kprintf("offset lower: 0x%x\n", idt[8].offset_1);
-  kprintf("offset mid: 0x%x\n", idt[8].offset_2);
-  kprintf("offset higher: 0x%x", idt[8].offset_3);*/
-  uint64_t* blah = ((uint64_t*)0xffffffffff);
-  *blah = 50;
+  init_idt();
+  create_idt_entry(8, (uint64_t)&double_fault_handler, TRAP_GATE_32);
+  //uint64_t *num = (uint64_t*)0xffffffffff;
+  //*num = 50;
   kprintf("good!");
-  return;
+  __asm__("cli; hlt");
 }
