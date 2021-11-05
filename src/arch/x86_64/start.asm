@@ -6,7 +6,7 @@ extern kmain
 long_mode_start:
   mov rsp, stack_top ; ESP is the register with the stack pointer, just set it to the highest memory address because the stack goes down
   mov rbp, stack_top
-  call kmain
+  call kmain ; we've spent enough time in assembly, back to C
   ;mov rax, 0x2f592f412f4b2f4f
   ;mov qword [0xb8000], rax
 

@@ -1,4 +1,5 @@
 global start
+global start_end
 global check_multiboot
 global check_cpuid
 global check_long_mode
@@ -6,6 +7,8 @@ global enable_paging
 global enable_long_mode
 global error
 global gdt64
+global boot_stack_top
+global boot_stack_bottom
 extern bootstrap
 extern long_mode_start
 
@@ -14,12 +17,12 @@ bits 32 ; 32 bit instructions, this will change to 64 once we go to long mode
 ; 0xb8000 is the VGA buffer for the screen
 start:
   cli
-  mov esp, stack_top ; ESP is the register with the stack pointer, just set it to the highest memory address because the stack goes down
-  mov ebp, stack_top
-  mov edi, ebx ; move the pointer to the memory_map to the first parameter
+  mov esp, boot_stack_top ; ESP is the register with the stack pointer, just set it to the highest memory address because the stack goes down
+  mov ebp, boot_stack_top
+  mov edi, ebx ; move the pointer to the boot information to the first parameter
   mov esi, eax ; move the magic number that says we're in multiboot to the second param
   call  bootstrap 
-  mov dword [0xb8000], 0x2f4b2f4f ; put OK on the screen
+  mov dword [0xb8000], 0x2f4b2f4f ; put OK on the screen, this code should never run
   hlt
 
 error: ; in x86_64 arch rdi is the register that has the first parameter
@@ -64,8 +67,8 @@ check_long_mode: ; check to see if we can enter long mode
   jmp error
 
 enable_paging: ; TODO this is hard coded as hell, make it go off a single constant
-  mov edi, 0x1000   ; the location in memory of the 4th level page table mov cr3, edi      ; let the CPU know where the page table is
-  mov cr3, edi
+  mov edi, 0x1000   ; the location in memory of the 4th level page table mov cr3, edi      
+  mov cr3, edi      ; let the CPU know where the page table is
   xor eax, eax      ; zero out eax
   mov ecx, 4096
   rep stosd         ; this instruction puts the value of EAX into the memory pointed at by EDI ECX number of times
@@ -132,8 +135,9 @@ gdt64:
   dw $ - gdt64 - 1 ; GDT length
   dq gdt64  ; GDT address
 
+start_end:
 section .bss
-stack_bottom:
+boot_stack_bottom:
   resb 0x2000 ; 8 kilobytes
-stack_top:
+boot_stack_top:
 
