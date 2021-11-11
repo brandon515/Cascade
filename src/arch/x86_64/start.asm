@@ -11,6 +11,8 @@ long_mode_start:
   ;mov qword [0xb8000], rax
 
 section .bss
+heap_start:
+  resb 0x8000 ; 32 kilobytes
 stack_bottom:
   resb 0x8000 ; 32 kilobytes
 stack_top:
