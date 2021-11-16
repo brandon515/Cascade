@@ -4,6 +4,8 @@
 #include "../arch/x86_64/idt.h"
 #include "interrupts.h"
 #include "multiboot2.h"
+#include "../arch/x86_64/start.h"
+#include "memory.h"
 
 /*struct multiboot_mmap_entry
 {
@@ -21,9 +23,17 @@
 
 void kmain(uint32_t* info, uint64_t* page_table, gdt_entry* gdt){
   cls();
-  create_idt_entry(8, (uint64_t)&double_fault_handler, TRAP_GATE_32);
+  create_idt_entry(8, (uint64_t)&double_fault_handler, TRAP_GATE_32); // create double fault handler so we don't go into a triple fault reset cycle
   //uint64_t *num = (uint64_t*)0xffffffffff;
   //*num = 50;
+  printf("INITILIZING KERNEL HEAP\n");
+  Sector *head = (Sector*)get_heap_start();
+  head->size = -1;
+  head->next = (head+1);
+  head = head->next;
+  head->size = 0x8000;
+  head->next = NULL;
+  printf("KERNEL HEAP INITILIZED\n");
   info = (uint32_t*)((uint8_t*)info-2); // for some reason the process from real mode to 64-bit adds 2 bytes to the address
   uint32_t boot_info_size = info[0]/4; // Grub makes the first 4 bytes of the boot info the size of the structure in bytes
   for(uint32_t i = 0; i < boot_info_size; i++){
@@ -62,6 +72,5 @@ void kmain(uint32_t* info, uint64_t* page_table, gdt_entry* gdt){
       }
     }
   }
-  printf("good!");
   __asm__("cli; hlt");
 }

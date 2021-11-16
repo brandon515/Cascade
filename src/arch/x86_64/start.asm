@@ -1,4 +1,5 @@
 global long_mode_start
+global get_heap_start
 
 section .text
 bits 64
@@ -9,6 +10,10 @@ long_mode_start:
   call kmain ; we've spent enough time in assembly, back to C
   ;mov rax, 0x2f592f412f4b2f4f
   ;mov qword [0xb8000], rax
+
+get_heap_start:
+  mov rax, heap_start
+  ret
 
 section .bss
 heap_start:
