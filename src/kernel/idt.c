@@ -25,9 +25,18 @@ void create_idt_entry(int idt_index, uint64_t function, uint8_t flags){
   idt[idt_index].zero = 0;
 }
 
+void load_idt_entries(){
+  create_idt_entry(8, (uint64_t)&double_fault_handler, TRAP_GATE_64); // create double fault handler so we don't go into a triple fault reset cycle
+  create_idt_entry(PIC_OFFSET, (uint64_t)&timer_handler, INT_GATE_64); // timer handler
+}
+
 void init_idt(){
+  printf("INITILIZING IDT\n");
   idt_descriptor idt_des;
   idt_des.limit = sizeof(idt_entry)*IDT_ENTRIES;
   idt_des.start = &idt[0];
   load_idt(&idt_des);
+  load_idt_entries();
+  printf("IDT INITILIZED\n");
 }
+

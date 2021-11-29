@@ -1,10 +1,13 @@
 #ifndef IDT_H_
 #define IDT_H_
 #include <stdint.h>
+#include "../../kernel/printf.h"
+#include "../../kernel/interrupts.h"
+#include "../../kernel/pic.h"
 
 #define IDT_ENTRIES 256
-#define TRAP_GATE_32 0x8f
-#define INT_GATE_32 0X8E
+#define TRAP_GATE_64 0x8F
+#define INT_GATE_64 0X8E
 
 typedef struct IDTDescr {
    uint16_t offset_1; // offset bits 0..15
