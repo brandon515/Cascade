@@ -63,7 +63,6 @@ void kfree(void *ptr){
 }
 
 struct multiboot_mmap_entry* init_memory(uint32_t* info){
-  printf("INITILIZING MEMORY MAP\n");
   uint32_t boot_info_size = info[0]/4; // Grub makes the first 4 bytes of the boot info the size of the structure in bytes
   int count = 0;
   struct multiboot_mmap_entry* stack_map;
@@ -118,12 +117,10 @@ struct multiboot_mmap_entry* init_memory(uint32_t* info){
       printf("Address: %x Length: %d Type: Available\n", heap_map[i].addr, heap_map[i].len);
     }
   }
-  printf("MEMORY MAP INITILIZED\n");
   return heap_map;
 }
 
 void init_heap(){
-  printf("INITILIZING KERNEL HEAP\n");
   Sector *head = (Sector*)get_heap_start();
   head->size = -1;
   head->next = (head+1);
@@ -134,5 +131,4 @@ void init_heap(){
   first->next = NULL;
   first->prev = head;
   first->free = true;
-  printf("KERNEL HEAP INITILIZED\n");
 }

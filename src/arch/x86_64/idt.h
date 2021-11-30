@@ -9,6 +9,19 @@
 #define TRAP_GATE_64 0x8F
 #define INT_GATE_64 0X8E
 
+// HARDWARE INTTERUPTS
+
+#define INT_TIMER       PIC_OFFSET
+#define INT_KEYBOARD    PIC_OFFSET+1
+#define INT_SERIAL_1    PIC_OFFSET+3
+#define INT_SERIAL_2    PIC_OFFSET+4
+#define INT_DISKETTE    PIC_OFFSET+6
+#define INT_PARALLEL    PIC_OFFSET+7
+#define INT_CMOS_CLOCK  PIC_OFFSET+8
+#define INT_CGA_VERT    PIC_OFFSET+9
+#define INT_FPU         PIC_OFFSET+13
+#define INT_HDD_CONT    PIC_OFFSET+14
+
 typedef struct IDTDescr {
    uint16_t offset_1; // offset bits 0..15
    uint16_t selector; // a code segment selector in GDT or LDT
