@@ -15,6 +15,10 @@ get_heap_start:
   mov rax, heap_start
   ret
 
+get_page_table:
+  mov rax, cr3
+  ret
+
 section .bss
 heap_start:
   resb 0x8000 ; 32 kilobytes

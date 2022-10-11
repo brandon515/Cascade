@@ -18,12 +18,12 @@ void *kalloc(size_t size){
     return NULL;
   }
 
-  // preserve the mem_sect entry in the linked list
+  // the start of the memory address is right after the memory sector
   void *ret = ((uint8_t*)mem_sect+sizeof(Sector));
 
   // create the new memory segment
   Sector *new_mem = (Sector*)((uint8_t*)ret+(sizeof(Sector)+size));
-  new_mem->size = mem_sect->size-(sizeof(Sector)+size);
+  new_mem->size = mem_sect->size-(sizeof(Sector)+size); // subtracting a sector because the size is just the usable memory size
   new_mem->free = true;
 
   //insert the new memory into the linked list
@@ -37,7 +37,7 @@ void *kalloc(size_t size){
   mem_sect->next = new_mem;
 
   // resize the now used sector and mark it as used
-  mem_sect->size = sizeof(Sector)+size;
+  mem_sect->size = size;
   mem_sect->free = false;
 
   return ret;
@@ -72,17 +72,17 @@ struct multiboot_mmap_entry* init_memory(uint32_t* info){
       if(mmap->entry_size != 24){
         continue;
       }
-      printf("Type: %d\n", mmap->type);
-      printf("Size: %d\n", mmap->size);
-      printf("Entry Size: %d\n", mmap->entry_size);
-      printf("Entry Version: %d\n", mmap->entry_version);
+      //printf("Type: %d\n", mmap->type);
+      //printf("Size: %d\n", mmap->size);
+      //printf("Entry Size: %d\n", mmap->entry_size);
+      //printf("Entry Version: %d\n", mmap->entry_version);
       for(uint32_t j = 0; j < mmap->size; j++){
         if(mmap->entries[j].type > 5){
           break;
         }
         switch(mmap->entries[j].type){
           case MULTIBOOT_MEMORY_AVAILABLE:
-            printf("Address: %x Length: %d Type: Available\n", mmap->entries[j].addr, mmap->entries[j].len);
+            //printf("Address: %x Length: %d Type: Available\n", mmap->entries[j].addr, mmap->entries[j].len);
             stack_map[count].addr = mmap->entries[j].addr;
             stack_map[count].len = mmap->entries[j].len;
             stack_map[count].type = mmap->entries[j].type;
@@ -90,16 +90,16 @@ struct multiboot_mmap_entry* init_memory(uint32_t* info){
             count++;
             break;
           case MULTIBOOT_MEMORY_RESERVED:
-            printf("Address: %x Length: %d Type: Reserved\n", mmap->entries[j].addr, mmap->entries[j].len);
+            //printf("Address: %x Length: %d Type: Reserved\n", mmap->entries[j].addr, mmap->entries[j].len);
             break;
           case MULTIBOOT_MEMORY_ACPI_RECLAIMABLE:
-            printf("Address: %x Length: %d Type: ACPI Reclaimable\n", mmap->entries[j].addr, mmap->entries[j].len);
+            //printf("Address: %x Length: %d Type: ACPI Reclaimable\n", mmap->entries[j].addr, mmap->entries[j].len);
             break;
           case MULTIBOOT_MEMORY_NVS:
-            printf("Address: %x Length: %d Type: NVS\n", mmap->entries[j].addr, mmap->entries[j].len);
+            //printf("Address: %x Length: %d Type: NVS\n", mmap->entries[j].addr, mmap->entries[j].len);
             break;
           case MULTIBOOT_MEMORY_BADRAM:
-            printf("Address: %x Length: %d Type: Bad Ram\n", mmap->entries[j].addr, mmap->entries[j].len);
+            //printf("Address: %x Length: %d Type: Bad Ram\n", mmap->entries[j].addr, mmap->entries[j].len);
             break;
           default:
             break;

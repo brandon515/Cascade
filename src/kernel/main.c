@@ -23,7 +23,7 @@
 };*/
 
 
-void kmain(uint32_t* info, uint64_t* page_table, gdt_entry* gdt){
+void kmain(uint32_t* info, gdt_entry* gdt){
   cls();
   printf("INITILIZING KERNEL HEAP\n");
   init_heap();
@@ -34,8 +34,8 @@ void kmain(uint32_t* info, uint64_t* page_table, gdt_entry* gdt){
   printf("INITILIZING IDT\n");
   init_idt();
   printf("IDT INITILIZED\n");
-  info = (uint32_t*)((uint8_t*)info-2); // for some reason the transition from real mode to 64-bit adds 2 bytes to the address
   printf("INITILIZING MEMORY MAP\n");
+  info = (uint32_t*)((uint8_t*)info-2); // for some reason the transition from real mode to 64-bit adds 2 bytes to the address
   struct multiboot_mmap_entry* a_mem = init_memory(info);
   printf("MEMORY MAP INITILIZED\n");
   while(true){}

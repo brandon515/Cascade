@@ -1,7 +1,7 @@
 #ifndef KEYBOARD_H_
 #define KEYBOARD_H_
 
-unsigned char kbdus[128] =
+static unsigned char kbdus[128] =
 {
     0,  27, '1', '2', '3', '4', '5', '6', '7', '8',	/* 9 */
   '9', '0', '-', '=', '\b',	/* Backspace */

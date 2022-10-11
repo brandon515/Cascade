@@ -12,6 +12,6 @@ void bootstrap(uint32_t info, uint32_t magic, uint32_t gdt){
   check_cpuid();
   check_long_mode();
   uint32_t page_table = enable_paging();
-  enable_long_mode(pass_info, page_table, gdt); // this is an assembly function that does an unconditional jump to long_mode_start in start.asm
+  enable_long_mode(pass_info, gdt); // this is an assembly function that does an unconditional jump to long_mode_start in start.asm
 	return; // this is never reached
 }
